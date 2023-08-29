@@ -10,15 +10,24 @@ bash ~/miniconda.sh -b -p $HOME/miniconda
 source /root/miniconda/bin/activate 
 conda init 
 source /root/.bashrc 
-conda create -n py38 -y python=3.8 
-conda activate py38 
-conda install -y numpy 
 
-cp dlrt-build/onnx/cmake-3.22.1-linux-x86_64.sh .
-chmod +x cmake-3.22.1-linux-x86_64.sh 
-mkdir /usr/bin/cmake
-./cmake-3.22.1-linux-x86_64.sh --skip-license --prefix=/usr/bin/cmake
-export PATH=$PATH:/usr/bin/cmake/bin
+if [ -f /usr/bin/python3.9 ] ; then
+	conda create -n py39 -y python=3.9 
+	conda activate py39 
+	conda install -y numpy 
+else
+	conda create -n py38 -y python=3.8 
+	conda activate py38 
+	conda install -y numpy 
+fi
+
+if [ ! -f /usr/bin/cmake ] ; then
+	cp dlrt-build/onnx/cmake-3.22.1-linux-x86_64.sh .
+	chmod +x cmake-3.22.1-linux-x86_64.sh 
+	mkdir /usr/bin/cmake
+	./cmake-3.22.1-linux-x86_64.sh --skip-license --prefix=/usr/bin/cmake
+	export PATH=$PATH:/usr/bin/cmake/bin
+fi
 
 chown root:root -R /root/dlrt-build/onnx/onnxruntime
 cd ~/dlrt-build/onnx/onnxruntime
@@ -37,7 +46,13 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 SET(CMAKE_FIND_ROOT_PATH /root/dlrt-build/onnx/targetfs/)
 EOF
 
+if [ -f /usr/bin/python3.9 ] ; then
+python3 tools/ci_build/build.py --build_dir build_aarch64 --config Release --build_shared_lib --parallel 8 --skip_tests --skip_onnx_tests --use_tidl --build_wheel --path_to_protoc_exe /root/dlrt-build/onnx/protobuf-3.11.3/src/protoc --cmake_extra_defines "CMAKE_TOOLCHAIN_FILE=/root/dlrt-build/onnx/onnxruntime/tools.cmake" "NUMPY_INCLUDE_DIR=/root/dlrt-build/onnx/targetfs/usr/lib/python3.9/site-packages/numpy/core/include" "PYTHON_INCLUDE_DIR=/root/dlrt-build/onnx//targetfs/usr/include;/root/dlrt-build/onnx//targetfs/usr/include/python3.9;/root/dlrt-build/onnx//targetfs/usr/lib/python3.9/site-packages/numpy/core/include" "PYTHON_LIBRARY=/root/dlrt-build/onnx//targetfs/usr/lib/python3.9" "CMAKE_VERBOSE_MAKEFILE:BOOL=ON"
+
+  mv ~/dlrt-build/onnx/onnxruntime/build_aarch64/Release/dist/onnxruntime_tidl-1.7.0-cp39-cp39-linux_x86_64.whl ~/dlrt-build/onnx/onnxruntime/build_aarch64/Release/dist/onnxruntime_tidl-1.7.0-cp39-cp39-linux_aarch64.whl
+else
 python3 tools/ci_build/build.py --build_dir build_aarch64 --config Release --build_shared_lib --parallel 32 --skip_tests --skip_onnx_tests --use_tidl --build_wheel --path_to_protoc_exe /root/dlrt-build/onnx/protobuf-3.11.3/src/protoc --cmake_extra_defines "CMAKE_TOOLCHAIN_FILE=/root/dlrt-build/onnx/onnxruntime/tools.cmake" "NUMPY_INCLUDE_DIR=/root/dlrt-build/onnx/targetfs/usr/lib/python3.8/site-packages/numpy/core/include" "PYTHON_INCLUDE_DIR=/root/dlrt-build/onnx//targetfs/usr/include;/root/dlrt-build/onnx//targetfs/usr/include/python3.8;/root/dlrt-build/onnx//targetfs/usr/lib/python3.8/site-packages/numpy/core/include" "PYTHON_LIBRARY=/root/dlrt-build/onnx//targetfs/usr/lib/python3.8" "CMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 
   mv ~/dlrt-build/onnx/onnxruntime/build_aarch64/Release/dist/onnxruntime_tidl-1.7.0-cp38-cp38-linux_x86_64.whl ~/dlrt-build/onnx/onnxruntime/build_aarch64/Release/dist/onnxruntime_tidl-1.7.0-cp38-cp38-linux_aarch64.whl
+fi
 cd ~/dlrt-build

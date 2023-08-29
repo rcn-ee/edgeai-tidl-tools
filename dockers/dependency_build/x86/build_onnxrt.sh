@@ -43,6 +43,7 @@ fi
 if [ $# -lt 1 ];then
     echo "usage ./build_onnxrt.sh ubuntu18"
     echo "usage ./build_onnxrt.sh ubuntu20"
+    echo "usage ./build_onnxrt.sh debian11"
     exit
 else
     echo "cross compiling onnxrt for arago linux" 
@@ -60,4 +61,4 @@ docker run -it --rm \
 
 #x86 build
 cd onnx/onnxruntime/
-python3 tools/ci_build/build.py --build_dir build_x86_64 --config Release --build_shared_lib --parallel 32 --skip_tests --skip_onnx_tests --use_tidl --build_wheel
+python3 tools/ci_build/build.py --build_dir build_x86_64 --config Release --build_shared_lib --parallel 8 --skip_tests --skip_onnx_tests --use_tidl --build_wheel
