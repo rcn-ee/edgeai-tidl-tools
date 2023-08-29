@@ -41,7 +41,7 @@ else
     USE_PROXY=0
 fi
 #To dwld the src files
-./tflite_2.8_prepare.sh
+./tflite_2.8_prepare_debian11.sh
 
 if [ $# -lt 1 ];then
     echo "usage ./build_tflite_2.8.sh ubuntu18"
