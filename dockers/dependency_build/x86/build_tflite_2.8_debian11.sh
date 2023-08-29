@@ -78,9 +78,9 @@ EOF
     
 else
     cd tflite_2.8/tensorflow_src/tensorflow/
-    make -C tensorflow/lite/tools/pip_package docker-build   TENSORFLOW_TARGET=aarch64 PYTHON_VERSION=3.9
+    make -C tensorflow/lite/tools/pip_package docker-build   TENSORFLOW_TARGET=aarch64 PYTHON_VERSION=3.9 BASE_IMAGE=debian:11
     sed -i 's/RUN python3 get-pip.py/RUN apt-get install -y python3-pip python-dev/g' tensorflow/lite/tools/pip_package/Dockerfile.py3
     sed -i 's/RUN rm get-pip.py//g ' tensorflow/lite/tools/pip_package/Dockerfile.py3 
-    make -C tensorflow/lite/tools/pip_package docker-build   TENSORFLOW_TARGET=aarch64 PYTHON_VERSION=3.9
+    make -C tensorflow/lite/tools/pip_package docker-build   TENSORFLOW_TARGET=aarch64 PYTHON_VERSION=3.9 BASE_IMAGE=debian:11
     
 fi
