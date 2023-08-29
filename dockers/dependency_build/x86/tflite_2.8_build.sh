@@ -38,7 +38,7 @@ cd ~
 #x_86 lib and py whl build
 pip3 install numpy==1.19.5
 cd ../../
-if [ !-d  tflite_build_x86 ];then
+if [ ! -d  tflite_build_x86 ];then
 rm -r  tflite_build_x86
 fi
 mkdir tflite_build_x86
